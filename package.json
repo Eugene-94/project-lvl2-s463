@@ -1,0 +1,26 @@
+{
+  "name": "gendiff-01-20",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Eugene-94/project-lvl2-s463.git"
+  },
+  "keywords": [
+    "configs",
+    "json",
+    "yml",
+    "ini",
+    "diffs"
+  ],
+  "author": "Eugene Kaygorodov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Eugene-94/project-lvl2-s463/issues"
+  },
+  "homepage": "https://github.com/Eugene-94/project-lvl2-s463#readme"
+}
