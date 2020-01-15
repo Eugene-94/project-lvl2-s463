@@ -1,10 +1,17 @@
 {
   "name": "gendiff-01-20",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "bin": {
+    "gendiff": "dist/bin/gendiff.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "NODE_ENV=production babel src --out-dir dist --source-maps inline",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -22,5 +29,11 @@
   "bugs": {
     "url": "https://github.com/Eugene-94/project-lvl2-s463/issues"
   },
-  "homepage": "https://github.com/Eugene-94/project-lvl2-s463#readme"
+  "homepage": "https://github.com/Eugene-94/project-lvl2-s463#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.8.3",
+    "@babel/core": "^7.8.3",
+    "@babel/node": "^7.8.3",
+    "@babel/preset-env": "^7.8.3"
+  }
 }
