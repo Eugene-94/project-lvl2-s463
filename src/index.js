@@ -1,12 +1,23 @@
 import _ from 'lodash';
 import fs from 'fs';
+import path from 'path';
+import getParser from './parsers';
 
 const getDifference = (path1, path2) => {
-  const data1 = fs.readFileSync(path1, 'utf-8');
-  const data2 = fs.readFileSync(path2, 'utf-8');
+  const firstConfigInfo = {
+    extension: path.extname(path1),
+    data: fs.readFileSync(path1, 'utf-8'),
+  };
 
-  const obj1 = JSON.parse(data1);
-  const obj2 = JSON.parse(data2);
+  const secondConfigInfo = {
+    extension: path.extname(path2),
+    data: fs.readFileSync(path2, 'utf-8'),
+  };
+
+  const parser = getParser(firstConfigInfo.extension);
+
+  const obj1 = parser(firstConfigInfo.data);
+  const obj2 = parser(secondConfigInfo.data);
 
   const keys = _.uniq([...Object.keys(obj1), ...Object.keys(obj2)]);
 
