@@ -2,37 +2,73 @@ import _ from 'lodash';
 import fs from 'fs';
 import path from 'path';
 import getParser from './parsers';
+import render from './render';
 
-const getDifference = (path1, path2) => {
-  const firstConfigInfo = {
-    extension: path.extname(path1),
-    data: fs.readFileSync(path1, 'utf-8'),
-  };
+const parse = (filePath) => {
+  const ext = path.extname(filePath);
+  const data = fs.readFileSync(filePath, 'utf-8');
+  const parser = getParser(ext);
 
-  const secondConfigInfo = {
-    extension: path.extname(path2),
-    data: fs.readFileSync(path2, 'utf-8'),
-  };
+  return parser(data);
+};
 
-  const parser = getParser(firstConfigInfo.extension);
+const typeActions = [
+  {
+    check: (key, obj1, obj2) => obj1[key] instanceof Object && obj2[key] instanceof Object,
+    process: (key, obj1, obj2, fn) => ({
+      type: 'object',
+      key,
+      children: fn(obj1[key], obj2[key]),
+    }),
+  },
+  {
+    check: (key, obj1, obj2) => !_.has(obj1, key) && _.has(obj2, key),
+    process: (key, obj1, obj2) => ({
+      type: 'added',
+      key,
+      value: obj2[key],
+    }),
+  },
+  {
+    check: (key, obj1, obj2) => _.has(obj1, key) && !_.has(obj2, key),
+    process: (key, obj1) => ({
+      type: 'deleted',
+      key,
+      value: obj1[key],
+    }),
+  },
+  {
+    check: (key, obj1, obj2) => obj1[key] !== obj2[key],
+    process: (key, obj1, obj2) => ({
+      type: 'changed',
+      key,
+      valueBefore: obj1[key],
+      valueAfter: obj2[key],
+    }),
+  },
+  {
+    check: (key, obj1, obj2) => obj1[key] === obj2[key],
+    process: (key, obj1) => ({
+      type: 'unchanged',
+      key,
+      value: obj1[key],
+    }),
+  },
+];
 
-  const obj1 = parser(firstConfigInfo.data);
-  const obj2 = parser(secondConfigInfo.data);
+const getTypeAction = (key, obj1, obj2) => typeActions.find(({ check }) => check(key, obj1, obj2));
 
-  const keys = _.uniq([...Object.keys(obj1), ...Object.keys(obj2)]);
+const buildAst = (obj1, obj2) => {
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+  const keys = _.uniq([...keys1, ...keys2]);
 
-  const diffs = keys.reduce((acc, key) => {
-    if (_.has(obj1, key) && _.has(obj2, key)) {
-      return obj1[key] === obj2[key] ? [...acc, `    ${key}: ${obj1[key]}`] : [...acc, `  + ${key}: ${obj2[key]}`, `  - ${key}: ${obj1[key]}`];
-    }
-    if (_.has(obj1, key) && !_.has(obj2, key)) return [...acc, `  - ${key}: ${obj1[key]}`];
-
-    return [...acc, `  + ${key}: ${obj2[key]}`];
+  const result = keys.reduce((acc, currentKey) => {
+    const { process } = getTypeAction(currentKey, obj1, obj2);
+    return [...acc, process(currentKey, obj1, obj2, buildAst)];
   }, []);
-
-  const result = ['{', ...diffs, '}'].join('\n');
 
   return result;
 };
 
-export default getDifference;
+export default (conf1, conf2) => render(buildAst(parse(conf1), parse(conf2)));

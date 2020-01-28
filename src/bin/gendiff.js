@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 import gendiff from '..';
 
 const program = require('commander');
