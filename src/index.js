@@ -2,7 +2,7 @@ import _ from 'lodash';
 import fs from 'fs';
 import path from 'path';
 import getParser from './parsers';
-import render from './render';
+import render from './formatters';
 
 const parse = (filePath) => {
   const ext = path.extname(filePath);
@@ -71,4 +71,10 @@ const buildAst = (obj1, obj2) => {
   return result;
 };
 
-export default (conf1, conf2) => render(buildAst(parse(conf1), parse(conf2)));
+export default (conf1, conf2, format = 'tree') => {
+  const data1 = parse(conf1);
+  const data2 = parse(conf2);
+  const ast = buildAst(data1, data2);
+
+  return render(ast, format);
+};

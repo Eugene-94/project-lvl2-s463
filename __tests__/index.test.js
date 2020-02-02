@@ -3,17 +3,17 @@ import path from 'path';
 import gendiff from '../src';
 
 test.each([
-  ['before.json', 'after.json', 'result.txt'],
-  ['before.yml', 'after.yml', 'result.txt'],
-  ['before.ini', 'after.ini', 'result.txt'],
-  ['before-tree.json', 'after-tree.json', 'result-tree.txt'],
-  ['before-tree.yml', 'after-tree.yml', 'result-tree.txt'],
-  ['before-tree.ini', 'after-tree.ini', 'result-tree.txt'],
-])('.gendiff(%s, %s)', (before, after, result) => {
-  const pathBefore = path.resolve(__dirname, `__fixtures__/${before}`);
-  const pathAfter = path.resolve(__dirname, `__fixtures__/${after}`);
+  ['.json', 'tree', 'result-tree.txt'],
+  ['.json', 'plain', 'result-plain.txt'],
+  ['.yml', 'tree', 'result-tree.txt'],
+  ['.yml', 'plain', 'result-plain.txt'],
+  ['.ini', 'tree', 'result-tree.txt'],
+  ['.ini', 'plain', 'result-plain.txt'],
+])('.gendiff(%s, %s, %s)', (extension, format, result) => {
+  const pathBefore = path.resolve(__dirname, `__fixtures__/before${extension}`);
+  const pathAfter = path.resolve(__dirname, `__fixtures__/after${extension}`);
   const pathResult = path.resolve(__dirname, `__fixtures__/${result}`);
 
   const resultData = fs.readFileSync(pathResult, 'utf-8').trim();
-  expect(gendiff(pathBefore, pathAfter)).toBe(resultData);
+  expect(gendiff(pathBefore, pathAfter, format)).toBe(resultData);
 });
