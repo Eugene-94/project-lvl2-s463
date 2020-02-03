@@ -4,7 +4,7 @@ import gendiff from '..';
 const program = require('commander');
 
 program
-  .version('0.6.0')
+  .version('1.0.0')
   .description('Compares two configuration files and shows a difference')
   .option('-f, --format <type>', 'Output format', 'tree')
   .arguments('<firstConfig> <secondConfig> [formatter]')

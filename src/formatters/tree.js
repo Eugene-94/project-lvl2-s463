@@ -16,26 +16,21 @@ const preRender = (ast, depth = 1) => {
   const result = ast.map((item) => {
     const tabs = getTabs(depth);
 
-    if (item.type === 'added') {
-      return [`${tabs}+ ${item.key}: ${stringify(item.value, depth)}`];
+    switch (item.type) {
+      case 'added':
+        return [`${tabs}+ ${item.key}: ${stringify(item.value, depth)}`];
+      case 'deleted':
+        return [`${tabs}- ${item.key}: ${stringify(item.value, depth)}`];
+      case 'changed':
+        return [
+          [`${tabs}- ${item.key}: ${stringify(item.valueBefore, depth)}`],
+          [`${tabs}+ ${item.key}: ${stringify(item.valueAfter, depth)}`],
+        ];
+      case 'unchanged':
+        return [`${tabs}  ${item.key}: ${stringify(item.value, depth)}`];
+      default:
+        return [`${tabs}  ${item.key}: {`, preRender(item.children, depth + 2), `${tabs}  }`];
     }
-
-    if (item.type === 'deleted') {
-      return [`${tabs}- ${item.key}: ${stringify(item.value, depth)}`];
-    }
-
-    if (item.type === 'changed') {
-      return [
-        [`${tabs}- ${item.key}: ${stringify(item.valueBefore, depth)}`],
-        [`${tabs}+ ${item.key}: ${stringify(item.valueAfter, depth)}`],
-      ];
-    }
-
-    if (item.type === 'unchanged') {
-      return [`${tabs}  ${item.key}: ${stringify(item.value, depth)}`];
-    }
-
-    return [`${tabs}  ${item.key}: {`, preRender(item.children, depth + 2), `${tabs}  }`];
   });
 
   return result;
