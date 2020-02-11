@@ -1,12 +1,12 @@
-const yaml = require('js-yaml');
-const ini = require('ini');
+import yaml from 'js-yaml';
+import ini from 'ini';
 
-export default (fileExtension) => {
-  const parsersType = {
+export default (data, ext) => {
+  const parsers = {
     '.json': JSON.parse,
     '.yml': yaml.safeLoad,
     '.ini': ini.parse,
   };
 
-  return parsersType[fileExtension];
+  return parsers[ext](data);
 };

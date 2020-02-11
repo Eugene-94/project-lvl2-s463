@@ -1,15 +1,13 @@
 import _ from 'lodash';
 import fs from 'fs';
 import path from 'path';
-import getParser from './parsers';
+import parse from './parsers';
 import render from './formatters';
 
-const parse = (filePath) => {
-  const ext = path.extname(filePath);
+const getData = (filePath) => {
   const data = fs.readFileSync(filePath, 'utf-8');
-  const parser = getParser(ext);
 
-  return parser(data);
+  return data;
 };
 
 const typeActions = [
@@ -59,21 +57,20 @@ const typeActions = [
 const getTypeAction = (key, obj1, obj2) => typeActions.find(({ check }) => check(key, obj1, obj2));
 
 const buildAst = (obj1, obj2) => {
-  const keys1 = Object.keys(obj1);
-  const keys2 = Object.keys(obj2);
-  const keys = _.uniq([...keys1, ...keys2]);
+  const keys = _.union(_.keys(obj1), _.keys(obj2));
 
-  const result = keys.reduce((acc, currentKey) => {
+  const result = keys.map((currentKey) => {
     const { process } = getTypeAction(currentKey, obj1, obj2);
-    return [...acc, process(currentKey, obj1, obj2, buildAst)];
-  }, []);
+
+    return process(currentKey, obj1, obj2, buildAst);
+  });
 
   return result;
 };
 
 export default (conf1, conf2, format = 'tree') => {
-  const data1 = parse(conf1);
-  const data2 = parse(conf2);
+  const data1 = parse(getData(conf1), path.extname(conf1));
+  const data2 = parse(getData(conf2), path.extname(conf2));
   const ast = buildAst(data1, data2);
 
   return render(ast, format);
