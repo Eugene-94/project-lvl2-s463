@@ -10,6 +10,11 @@ const getData = (filePath) => {
   return data;
 };
 
+const getDataType = (filepath) => path.extname(filepath)
+  .split('.')
+  .join(' ')
+  .trim();
+
 const typeActions = [
   {
     check: (key, obj1, obj2) => obj1[key] instanceof Object && obj2[key] instanceof Object,
@@ -69,8 +74,8 @@ const buildAst = (obj1, obj2) => {
 };
 
 export default (conf1, conf2, format = 'tree') => {
-  const data1 = parse(getData(conf1), path.extname(conf1));
-  const data2 = parse(getData(conf2), path.extname(conf2));
+  const data1 = parse(getData(conf1), getDataType(conf1));
+  const data2 = parse(getData(conf2), getDataType(conf2));
   const ast = buildAst(data1, data2);
 
   return render(ast, format);

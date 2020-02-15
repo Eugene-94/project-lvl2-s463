@@ -31,7 +31,7 @@ const preRender = (ast, depth = 1) => {
       case 'object':
         return [`${tabs}  ${item.key}: {`, preRender(item.children, depth + 2), `${tabs}  }`];
       default:
-        throw new Error('unknown node type');
+        throw new Error(`The type '${item.type}' is not supported`);
     }
   });
 

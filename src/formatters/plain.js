@@ -22,7 +22,7 @@ const plainRender = (ast, path = '') => {
       case 'object':
         return `${plainRender(item.children, buildPath(path, item.key))}`;
       default:
-        throw new Error('unknown node type');
+        throw new Error(`The type '${item.type}' is not supported`);
     }
   });
 
